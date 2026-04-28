@@ -84,15 +84,23 @@ Table 2 — Land‑use and computed runoff coefficients for pre‑ and post‑ur
 
 Table 3 — Storm events summary (metadata and intensities)
 
-| Event ID | Start date | End date | Depth (mm) | Duration (hr) | Intensity (mm/hr) |
-|---|---|---|---:|---:|---:|
-| (see `data/raw/rainfall_events.csv`) | | | | | |
+| Event ID (preview) | Depth (mm) | Duration (hr) | Intensity (mm/hr) |
+|---|---:|---:|---:|
+| See full CSV: `data/raw/rainfall_events.csv` | | | |
+| **Min depth** | 155.86 | - | - |
+| **Max depth** | 229.46 | - | - |
+| **Mean intensity** | - | - | 7.649 |
 
 Table 4 — Per-event peak discharge comparison (source: outputs/tables/pre_post_comparison.csv)
 
-| Event ID | I (mm/hr) | Qp_pre (m3/s) | Qp_post (m3/s) | ΔQ (m3/s) | % Increase |
+| Event ID (preview) | I (mm/hr) | Qp_pre (m3/s) | Qp_post (m3/s) | ΔQ (m3/s) | % Increase |
 |---|---:|---:|---:|---:|---:|
-| (see `outputs/tables/pre_post_comparison.csv`) | | | | | |
+| See full CSV: `outputs/tables/pre_post_comparison.csv` | | | | | |
+| **Qp_pre (min)** | - | 539.61 | - | - | - |
+| **Qp_pre (max)** | - | 794.423 | - | - | - |
+| **Qp_post (min)** | - | - | 558.263 | - | - |
+| **Qp_post (max)** | - | - | 821.885 | - | - |
+| **Mean % increase** | - | - | - | - | 3.45679 |
 
 Table 5 — Aggregate indicators summarizing change across events
 
