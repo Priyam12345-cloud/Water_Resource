@@ -17,6 +17,8 @@ This project is directly related to the Water Resource Engineering course becaus
 
 The project asks a simple engineering question: if rainfall is the same, how much does runoff increase when a catchment becomes more urban? To answer this, I used real open data instead of dummy values. The rainfall input came from NASA POWER, and land-use information came from the JRC GHS-UCDB database. I then compared pre-urban and post-urban runoff response using a consistent method so that the impact of urbanization could be interpreted clearly.
 
+This topic matters in the course because small changes in land cover can alter runoff response more than the rainfall itself during design storms. That is why urban hydrology problems are often built around rainfall intensity, drainage planning, and imperviousness rather than around annual totals alone. The report therefore focuses on event-scale runoff estimation, which is a direct application of the course concepts and a realistic first step for flood screening in a rapidly developing city.
+
 ## 2 Methods and Data
 
 ### 2.1 Data used
@@ -34,6 +36,10 @@ I used a stepwise workflow.
    where $Q_p$ is peak discharge in m3/s, $C$ is runoff coefficient, $I$ is rainfall intensity in mm/hr, and $A$ is catchment area in km2.
 4. I compared pre-urban and post-urban peak discharge for each event using `scripts/runoff_analysis.py`.
 5. Finally, I tested uncertainty by sampling runoff coefficients and rainfall intensity in `scripts/sensitivity_uncertainty.py`.
+
+The processing choices were kept deliberately simple so that the method stays transparent. For rainfall, I used the event-based dataset created from the NASA POWER record, which gave a consistent duration for each storm and allowed direct comparison across cases. For land use, I used the UCDB workbook because it contains a built-up measure that can be converted into an impervious fraction without inventing assumptions from scratch. For the runoff coefficient, I combined impervious and pervious response values with standard engineering weights, which made the method repeatable and easy to audit.
+
+
 
 ### 2.3 My role in the project
 My main work was the runoff analysis pipeline, event intensity estimation, UCDB-to-land-use conversion, output checking, figure interpretation, and report writing from my contribution perspective. I also validated that the final outputs were generated from real data and that the project no longer relied on template coefficients.
@@ -63,86 +69,38 @@ To test whether the result depends strongly on a single choice of runoff coeffic
 
 The broader implication is that urban expansion increases flood potential even when the change in runoff coefficient appears small at the catchment scale. In practice, this means drainage systems need to be designed with future land-use conditions in mind and not only with present-day terrain assumptions [5]. A limitation of my analysis is that it uses a single-point rainfall source and the Rational Method, so it is best treated as a comparative engineering assessment rather than a full hydraulic simulation [1], [2]. A stronger study would use spatial rainfall, observed discharge data, and a calibrated hydrologic model.
 
-### 3.4 Tabulated results
+These findings are also consistent with the general conclusion of urban runoff studies: once a catchment becomes more impervious, a larger share of rainfall is converted into quick surface runoff and the hydrograph peak rises. My result is modest in magnitude, but that is still important because even a 3 to 4 percent increase can matter when a drainage system is already close to capacity. The uncertainty analysis shows that this conclusion is not highly sensitive to small coefficient changes, which makes the main message more reliable for an engineering audience.
 
-Table 1 — Catchment and data summary
+### 3.4 Key numerical summary
 
-| Item | Value |
-|---|---|
-| Catchment | Mumbai (urban centre) |
-| Area (km2) | 738.0 |
-| Rainfall source | NASA POWER (daily point) — processed to events in [data/raw/rainfall_events.csv](../data/raw/rainfall_events.csv) |
-| Rainfall period | See [data/raw/rainfall_events.csv](../data/raw/rainfall_events.csv) |
-| Land-use source | JRC GHS-UCDB R2024A (regional workbook) — see `data/external/ucdb` |
+Table 1. Compact summary of the main quantitative results used in the analysis.
 
-Table 2 — Land‑use and computed runoff coefficients for pre‑ and post‑urban scenarios
-
-| Scenario | Area (km2) | Impervious fraction | Pervious fraction | Weighted C |
-|---|---:|---:|---:|---:|
-| pre_urban | 738.0 | 0.162 | 0.838 | 0.405 |
-| post_urban | 738.0 | 0.1828 | 0.8172 | 0.419 |
-
-Table 3 — Storm events summary (metadata and intensities)
-
-| Event ID | Start date | Depth (mm) | Duration (hr) | Intensity (mm/hr) |
-|:---|:---|---:|---:|---:|
-| N01 | 2000-07-12 | 203.52 | 24 | 8.48 |
-| N02 | 2005-07-26 | 210.55 | 24 | 8.77292 |
-| N03 | 2005-07-31 | 155.86 | 24 | 6.49417 |
-| N04 | 2005-08-01 | 160.89 | 24 | 6.70375 |
-| N05 | 2006-07-05 | 174.36 | 24 | 7.265 |
-| N06 | 2006-08-06 | 228.84 | 24 | 9.535 |
-| N07 | 2006-08-07 | 172.47 | 24 | 7.18625 |
-| N08 | 2006-08-08 | 158.31 | 24 | 6.59625 |
-| N09 | 2007-06-23 | 229.46 | 24 | 9.56083 |
-| N10 | 2007-07-01 | 181.99 | 24 | 7.58292 |
-| N11 | 2009-07-14 | 161.10 | 24 | 6.7125 |
-| N12 | 2013-06-16 | 165.46 | 24 | 6.89417 |
-
-Table 4 — Per-event peak discharge comparison (source: outputs/tables/pre_post_comparison.csv)
-
-| Event ID | I (mm/hr) | Qp_pre (m3/s) | Qp_post (m3/s) | Delta (m3/s) | % Increase |
-|:---|---:|---:|---:|---:|---:|
-| N01 | 8.48 | 704.615 | 728.972 | 24.3571 | 3.45679 |
-| N02 | 8.77292 | 728.954 | 754.153 | 25.1984 | 3.45679 |
-| N03 | 6.49417 | 539.61 | 558.263 | 18.6532 | 3.45679 |
-| N04 | 6.70375 | 557.024 | 576.279 | 19.2552 | 3.45679 |
-| N05 | 7.265 | 603.659 | 624.526 | 20.8672 | 3.45679 |
-| N06 | 9.535 | 792.277 | 819.664 | 27.3873 | 3.45679 |
-| N07 | 7.18625 | 597.116 | 617.757 | 20.641 | 3.45679 |
-| N08 | 6.59625 | 548.092 | 567.038 | 18.9464 | 3.45679 |
-| N09 | 9.56083 | 794.423 | 821.885 | 27.4615 | 3.45679 |
-| N10 | 7.58292 | 630.075 | 651.856 | 21.7804 | 3.45679 |
-| N11 | 6.7125 | 557.751 | 577.031 | 19.2803 | 3.45679 |
-| N12 | 6.89417 | 572.846 | 592.648 | 19.8021 | 3.45679 |
-
-Table 5 — Aggregate indicators summarizing change across events
-
-| Metric | Value |
-|---|---:|
-| n_events | 12 |
-| mean Qp_pre (m3/s) | 635.5368 |
-| mean Qp_post (m3/s) | 657.5060 |
-| mean ΔQ (m3/s) | 21.9692 |
-| mean % increase | 3.45679 |
-
-Table 6 — Monte Carlo sensitivity summary for mean percent increase (source: outputs/tables/sensitivity_summary.csv)
-
-| Metric | Value (%) |
-|---|---:|
-| mean | 3.40174 |
-| std | 0.65573 |
-| 5th percentile | 2.47487 |
-| 50th percentile | 3.32637 |
-| 95th percentile | 4.59063 |
+| Metric | Value | Meaning |
+|---|---:|---|
+| Catchment area | 738.0 km2 | Mumbai urban centre area used in the Rational Method |
+| Rainfall events | 12 | Number of storm events extracted from NASA POWER data |
+| Rainfall depth range | 155.86 to 229.46 mm | Smallest and largest event depths |
+| Rainfall intensity range | 6.49417 to 9.56083 mm/hr | Smallest and largest event intensities |
+| Runoff coefficient, pre-urban | 0.405 | Weighted coefficient from UCDB land-use data |
+| Runoff coefficient, post-urban | 0.419 | Weighted coefficient after urban expansion |
+| Peak discharge, pre-urban | 539.61 to 794.423 m3/s | Minimum to maximum event response |
+| Peak discharge, post-urban | 558.263 to 821.885 m3/s | Minimum to maximum event response |
+| Mean peak discharge, pre-urban | 635.5368 m3/s | Average event response before urbanization |
+| Mean peak discharge, post-urban | 657.5060 m3/s | Average event response after urbanization |
+| Mean increase in peak discharge | 21.9692 m3/s | Average absolute rise in discharge |
+| Mean percent increase | 3.45679% | Average relative increase across events |
+| Sensitivity mean | 3.40174% | Monte Carlo mean percent increase |
+| Sensitivity 5th to 95th percentile | 2.47487% to 4.59063% | Spread of the uncertainty analysis |
 
 Notes:
-- Full per-event tables (Table 3 and Table 4) are available as CSVs in the `outputs/tables/` and `data/raw/` folders; include them in an appendix if required by the instructor.
+- Full event-by-event rows are available in [data/raw/rainfall_events.csv](../data/raw/rainfall_events.csv) and [outputs/tables/pre_post_comparison.csv](../outputs/tables/pre_post_comparison.csv), but they are not repeated in the main text to keep the report within the publication-unit limit.
 
 ## 4 Conclusions
 The project shows that urbanization in Mumbai increases peak runoff for the analyzed events. Using real rainfall and UCDB land-use data, I found that the post-urban scenario consistently produces higher peak discharge than the pre-urban scenario. The average increase was about 3.5%, and the uncertainty analysis confirmed that this result is stable under reasonable parameter variation.
 
 The main improvement I would suggest for future work is to include observed streamflow or drainage data for calibration. If that is not available, the next best step would be to use spatial rainfall data and a more detailed runoff model such as SCS-CN or a distributed hydrologic model. Even with the current simplified method, the project clearly shows the effect of urbanization on runoff generation and flood risk.
+
+Another useful extension would be to compare several Indian cities or multiple sub-catchments within Mumbai so that the effect of different land-use patterns can be separated more clearly. It would also be useful to test design storms with shorter durations, because short intense bursts are often the events that govern urban flooding. Within the current scope, however, the analysis achieves its main goal: it uses real data, follows a defensible engineering method, and shows that urbanization increases runoff response in a measurable and robust way.
 
 ## 5 References
 [1] Chow, V.T., Maidment, D.R. and Mays, L.W., 1988. *Applied Hydrology*. New York: McGraw-Hill.
