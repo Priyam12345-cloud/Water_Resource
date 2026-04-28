@@ -7,6 +7,9 @@
 - Auto-generated output tables and figures.
 - Technical paper outline.
 
+![Figure 3. Monte Carlo distribution of the mean percent increase in peak discharge due to urbanization.](../outputs/figures/sensitivity_hist_mean_percent_increase.png)
+
+![Figure 1. Peak discharge comparison for pre-urban and post-urban scenarios across the selected storm events in Mumbai.](../outputs/figures/extended_box_pre_post.png)
 ## Folder structure
 - `data/raw/`: input CSV files
 - `data/processed/`: optional cleaned data
