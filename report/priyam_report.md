@@ -63,6 +63,60 @@ To test whether the result depends strongly on a single choice of runoff coeffic
 
 The broader implication is that urban expansion increases flood potential even when the change in runoff coefficient appears small at the catchment scale. In practice, this means drainage systems need to be designed with future land-use conditions in mind and not only with present-day terrain assumptions [5]. A limitation of my analysis is that it uses a single-point rainfall source and the Rational Method, so it is best treated as a comparative engineering assessment rather than a full hydraulic simulation [1], [2]. A stronger study would use spatial rainfall, observed discharge data, and a calibrated hydrologic model.
 
+### 3.4 Tabulated results
+
+Table 1 — Catchment and data summary
+
+| Item | Value |
+|---|---|
+| Catchment | Mumbai (urban centre) |
+| Area (km2) | 738.0 |
+| Rainfall source | NASA POWER (daily point) — processed to events in [data/raw/rainfall_events.csv](../data/raw/rainfall_events.csv) |
+| Rainfall period | See [data/raw/rainfall_events.csv](../data/raw/rainfall_events.csv) |
+| Land-use source | JRC GHS-UCDB R2024A (regional workbook) — see `data/external/ucdb` |
+
+Table 2 — Land‑use and computed runoff coefficients for pre‑ and post‑urban scenarios
+
+| Scenario | Area (km2) | Impervious fraction | Pervious fraction | Weighted C |
+|---|---:|---:|---:|---:|
+| pre_urban | 738.0 | 0.162 | 0.838 | 0.405 |
+| post_urban | 738.0 | 0.1828 | 0.8172 | 0.419 |
+
+Table 3 — Storm events summary (metadata and intensities)
+
+| Event ID | Start date | End date | Depth (mm) | Duration (hr) | Intensity (mm/hr) |
+|---|---|---|---:|---:|---:|
+| (see `data/raw/rainfall_events.csv`) | | | | | |
+
+Table 4 — Per-event peak discharge comparison (source: outputs/tables/pre_post_comparison.csv)
+
+| Event ID | I (mm/hr) | Qp_pre (m3/s) | Qp_post (m3/s) | ΔQ (m3/s) | % Increase |
+|---|---:|---:|---:|---:|---:|
+| (see `outputs/tables/pre_post_comparison.csv`) | | | | | |
+
+Table 5 — Aggregate indicators summarizing change across events
+
+| Metric | Value |
+|---|---:|
+| n_events | 12 |
+| mean Qp_pre (m3/s) | 635.5368 |
+| mean Qp_post (m3/s) | 657.5060 |
+| mean ΔQ (m3/s) | 21.9692 |
+| mean % increase | 3.45679 |
+
+Table 6 — Monte Carlo sensitivity summary for mean percent increase (source: outputs/tables/sensitivity_summary.csv)
+
+| Metric | Value (%) |
+|---|---:|
+| mean | 3.40174 |
+| std | 0.65573 |
+| 5th percentile | 2.47487 |
+| 50th percentile | 3.32637 |
+| 95th percentile | 4.59063 |
+
+Notes:
+- Full per-event tables (Table 3 and Table 4) are available as CSVs in the `outputs/tables/` and `data/raw/` folders; include them in an appendix if required by the instructor.
+
 ## 4 Conclusions
 The project shows that urbanization in Mumbai increases peak runoff for the analyzed events. Using real rainfall and UCDB land-use data, I found that the post-urban scenario consistently produces higher peak discharge than the pre-urban scenario. The average increase was about 3.5%, and the uncertainty analysis confirmed that this result is stable under reasonable parameter variation.
 
