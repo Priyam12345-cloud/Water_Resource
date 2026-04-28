@@ -1,8 +1,6 @@
 # CE343: Rainfall Variability and Urban Runoff (Mumbai Case Study)
 
-This repository is set up so you can complete your project quickly using the Rational Method.
-
-## What is already prepared
+## What is prepared
 - Input templates for rainfall events and land-use scenarios.
 - A Python script that computes peak discharge for pre-urban and post-urban conditions.
 - Sensitivity analysis for rainfall intensity and runoff coefficient.
@@ -22,7 +20,7 @@ Create these files in `data/raw/`:
 1. `rainfall_events.csv`
 2. `landuse_scenarios.csv`
 
-Note: template files were removed from the repository and replaced by UCDB-derived land-use processing. Use the provided scripts to generate files from source data (NASA POWER and JRC GHS-UCDB).
+Note: template files were removed from the repository and replaced by UCDB-derived land-use processing. Used the provided scripts to generate files from source data (NASA POWER and JRC GHS-UCDB).
 
 ## Recommended data source list
 See: `data/raw/README_data_sources.md`
@@ -59,5 +57,3 @@ Qp = 0.278 * C * I * A
 - Priyam: intensity estimation, model setup, sensitivity analysis
 - Both: final technical paper
 
-## Important note on data ownership
-For your course submission, it is better if you download and keep the final datasets in this repo so your work is reproducible and auditable.
