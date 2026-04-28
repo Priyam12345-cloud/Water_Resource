@@ -1,102 +1,87 @@
 # Analysis of Rainfall Variability and Its Impact on Runoff Generation in an Urban Catchment
 
-**Course:** Water Resource Engineering (CE 343)
-
+**Priyam Raj (23B0626)**  
+**Course:** Water Resource Engineering (CE 343)  
 **Submitted to:** Riddhi Singh
 
-**Team:**
-- Anjali Jangid — 23B0625
-- Priyam Raj — 23B0626
-
----
+## Key Messages
+- Urbanization raised peak discharge for every analyzed storm event.
+- UCDB-based land-use values replaced placeholder runoff assumptions.
+- Results remained robust under moderate uncertainty in coefficients and rainfall intensity.
 
 ## Abstract
+This project examines how rainfall variability and urbanization alter runoff generation in Mumbai, a rapidly urbanizing coastal city. I processed NASA POWER daily rainfall into storm events, derived event intensities, and used JRC GHS-UCDB built-up data to estimate impervious fraction and weighted runoff coefficients. Peak discharge was computed with the Rational Method for pre- and post-urban scenarios. I also carried out a Monte Carlo sensitivity analysis to test uncertainty in runoff coefficients and rainfall intensity. The results show a consistent rise in peak discharge after urbanization, with a mean increase of about 3.5%. The sensitivity results confirm that the main conclusion is stable under reasonable parameter uncertainty.
 
-This report (Priyam Raj contribution) documents the data processing, modelling, and sensitivity analysis performed to evaluate how urbanization affects rainfall–runoff response in Mumbai. Using NASA POWER rainfall and JRC GHS‑UCDB built‑up data, we computed event intensities, derived impervious fractions, and applied the Rational Method to estimate peak discharges for pre‑ and post‑urban scenarios. A Monte Carlo sensitivity analysis quantifies uncertainty from runoff coefficients and rainfall intensity variability.
+## 1 Introduction
+This project is directly related to the Water Resource Engineering course because it applies core concepts used in flood estimation, drainage design, and watershed response analysis. The Rational Method, runoff coefficient, rainfall intensity, and catchment area are standard tools in urban hydrology [1], [2], and this project uses them to study how land-use change affects peak runoff. I selected a Mumbai case study because the city has undergone strong urban expansion and is a practical example of how increased impervious area can influence flood risk [5].
 
-## Data Sources
+The project asks a simple engineering question: if rainfall is the same, how much does runoff increase when a catchment becomes more urban? To answer this, I used real open data instead of dummy values. The rainfall input came from NASA POWER, and land-use information came from the JRC GHS-UCDB database. I then compared pre-urban and post-urban runoff response using a consistent method so that the impact of urbanization could be interpreted clearly.
 
-- Rainfall: NASA POWER daily point product (local file: data/POWER_Point_Daily_20000101_20241231_019d08N_072d88E_LST.csv). Processed events: [data/raw/rainfall_events.csv](data/raw/rainfall_events.csv).
-- Land use / built‑up: JRC GHS‑UCDB R2024A (regional workbook used: data/external/ucdb/temp/GHS_UCDB_REGION_CENTRAL_AND_SOUTHERN_ASIA_R2024A.xlsx). The UCDB record for Mumbai (ID 7599) was used to compute impervious fractions.
+## 2 Methods and Data
 
-## Methods (Priyam)
+### 2.1 Data used
+I used two open datasets. First, daily rainfall for Mumbai was obtained from NASA POWER and converted into discrete storm events in [data/raw/rainfall_events.csv](../data/raw/rainfall_events.csv) [4]. Second, land-use and built-up information for Mumbai was extracted from the JRC GHS-UCDB regional workbook in `data/external/ucdb/temp/GHS_UCDB_REGION_CENTRAL_AND_SOUTHERN_ASIA_R2024A.xlsx` [3]. The UCDB record for Mumbai was used to compute the urban area and built-up fraction, which then fed into the runoff coefficient calculation in [data/raw/landuse_scenarios.csv](../data/raw/landuse_scenarios.csv).
 
-1. Event extraction: daily precipitation was converted to discrete storm events with durations and intensities (`scripts/prepare_nasa_events.py`).
-2. Land‑use conversion: `scripts/ucdb_to_landuse.py` extracts built‑up area and urban area from UCDB and computes impervious_fraction = built_up_m2 / (area_km2 * 1e6). Weighted runoff coefficients are computed with C_imp = 0.95 and C_perv = 0.30 as documented in the script. Output: [data/raw/landuse_scenarios.csv](data/raw/landuse_scenarios.csv#L1-L3).
-3. Peak discharge: Rational Method (SI) with Qp = 0.278 * C * I * A (scripts/runoff_analysis.py). Area `A` in km², intensity `I` in mm/hr, produces Qp in m³/s.
-4. Sensitivity/uncertainty: Monte Carlo sampling of C_imp ~ N(0.95,0.03) truncated, C_perv ~ N(0.30,0.05) truncated, and intensity multiplier ~ N(1,0.1) applied event-wise. The analysis (scripts/sensitivity_uncertainty.py) produced distributions of mean percent increase (post vs pre) and saved results in `outputs/tables/sensitivity_summary.csv`.
+### 2.2 Method followed
+I used a stepwise workflow.
 
-## Results
+1. Daily rainfall values were grouped into storm events and event intensity was computed from rainfall depth and duration using `scripts/prepare_nasa_events.py`.
+2. UCDB built-up area was divided by catchment area to estimate impervious fraction. Weighted runoff coefficients were then calculated from impervious and pervious component values using `scripts/ucdb_to_landuse.py`, following standard urban hydrology practice [1], [2].
+3. Peak discharge was computed with the Rational Method:
 
-- UCDB‑derived land‑use scenarios: [data/raw/landuse_scenarios.csv](data/raw/landuse_scenarios.csv#L1-L3)
-  - `pre_urban`: impervious_fraction ≈ 0.162, C ≈ 0.405
-  - `post_urban`: impervious_fraction ≈ 0.1828, C ≈ 0.419
+   $Q_p = 0.278 \cdot C \cdot I \cdot A$
 
-- Event summary (12 events): [outputs/tables/pre_post_comparison.csv](outputs/tables/pre_post_comparison.csv#L1-L12)
+   where $Q_p$ is peak discharge in m3/s, $C$ is runoff coefficient, $I$ is rainfall intensity in mm/hr, and $A$ is catchment area in km2.
+4. I compared pre-urban and post-urban peak discharge for each event using `scripts/runoff_analysis.py`.
+5. Finally, I tested uncertainty by sampling runoff coefficients and rainfall intensity in `scripts/sensitivity_uncertainty.py`.
 
-- Aggregate statistics: [outputs/tables/extended_summary.csv](outputs/tables/extended_summary.csv#L1-L2)
-  - n_events = 12
-  - mean_pre = 635.54 m3/s
-  - mean_post = 657.51 m3/s
-  - mean_delta ≈ 21.97 m3/s
-  - mean percent increase ≈ 3.46%
+### 2.3 My role in the project
+My main work was the runoff analysis pipeline, event intensity estimation, UCDB-to-land-use conversion, output checking, figure interpretation, and report writing from my contribution perspective. I also validated that the final outputs were generated from real data and that the project no longer relied on template coefficients.
 
-- Sensitivity Monte Carlo (2000 samples): [outputs/tables/sensitivity_summary.csv](outputs/tables/sensitivity_summary.csv)
-  - Mean of mean percent increase = 3.402% (std = 0.656%)
-  - 5th–95th percentile ≈ 2.47% – 4.59%
+## 3 Results
 
-### Key figures (open these files)
-- Boxplot pre vs post: [outputs/figures/extended_box_pre_post.png](outputs/figures/extended_box_pre_post.png)
-- Histogram percent increase: [outputs/figures/extended_hist_percent_increase.png](outputs/figures/extended_hist_percent_increase.png)
-- Intensity vs ΔQ scatter: [outputs/figures/extended_scatter_intensity_delta.png](outputs/figures/extended_scatter_intensity_delta.png)
-- CDF post peaks: [outputs/figures/extended_cdf_post_peak.png](outputs/figures/extended_cdf_post_peak.png)
-- Top 10 percent increase: [outputs/figures/extended_top10_percent_increase.png](outputs/figures/extended_top10_percent_increase.png)
-- Sensitivity histogram: [outputs/figures/sensitivity_hist_mean_percent_increase.png](outputs/figures/sensitivity_hist_mean_percent_increase.png)
+### 3.1 Urbanization increased peak discharge across all events
+The event-wise comparison shows that the post-urban scenario always produced a higher peak discharge than the pre-urban scenario. The mean pre-urban discharge was about 635.54 m3/s, while the mean post-urban discharge was about 657.51 m3/s. This gives a mean increase of about 21.97 m3/s, or 3.46%. The increase is not extreme, but it is consistent across the selected storms, which indicates that urbanization has a measurable effect even when the change in impervious fraction is moderate [5].
 
-## Discussion (Priyam)
+**Figure 1. Peak discharge comparison for pre-urban and post-urban scenarios across the selected storm events in Mumbai. The two distributions are shown as boxplots to highlight the shift in runoff response after urbanization.**
 
-The Monte Carlo analysis shows that uncertainties in component runoff coefficients and plausible intensity variability produce modest uncertainty around the mean percent increase; the 90% interval for the mean percent increase is approximately 2.5–4.6%. This reinforces that—given the relatively small change in impervious fraction detected in UCDB—the expected increase in peak discharge is robust but modest.
+![Figure 1. Peak discharge comparison for pre-urban and post-urban scenarios across the selected storm events in Mumbai.](../outputs/figures/extended_box_pre_post.png)
 
-## Limitations
+### 3.2 Higher rainfall intensity produced larger runoff changes
+The scatter plot between rainfall intensity and the increase in discharge shows that stronger storms produce larger absolute differences between the two scenarios. This is expected from the Rational Method because discharge is directly proportional to rainfall intensity [1], [2]. The plot also shows that the post-urban case is consistently above the pre-urban case, so the urban effect is preserved at both low and high intensities. This result is useful because it shows that urbanization does not only shift the average response; it also amplifies the runoff response during intense events, which are the events most relevant for flooding and drainage design [5].
 
-- Single‑point rainfall (NASA POWER) rather than spatial gauge network.
-- Rational Method simplifications; results are scenario‑comparative rather than detailed hydraulic design outputs.
-- Component coefficient priors (C_imp, C_perv) are literature defaults; local calibration would reduce uncertainty.
+**Figure 2. Relationship between rainfall intensity and increase in peak discharge after urbanization. The x-axis shows event intensity in mm/hr and the y-axis shows the change in peak discharge in m3/s.**
 
-## Conclusions and Recommendations
+![Figure 2. Relationship between rainfall intensity and increase in peak discharge after urbanization.](../outputs/figures/extended_scatter_intensity_delta.png)
 
-Urbanization as quantified increases peak discharges consistently across sampled storms; the effect magnitude is moderate for Mumbai given UCDB built‑up changes. For stronger conclusions, use spatial rainfall data, hydrologic models (SCS‑CN or distributed models), and local calibration with observed discharge records.
+### 3.3 The conclusion is robust under uncertainty
+To test whether the result depends strongly on a single choice of runoff coefficient, I ran a Monte Carlo uncertainty analysis. I sampled impervious and pervious runoff coefficients and also varied rainfall intensity within a reasonable range. The resulting distribution of mean percent increase stayed clustered around about 3.4%, with a 90% range of roughly 2.47% to 4.59%. This shows that the project conclusion is not a fragile result of one parameter choice. Even if the coefficients vary moderately, the overall finding remains the same: the post-urban catchment produces higher runoff [1], [2].
 
-## Individual contributions
+**Figure 3. Monte Carlo distribution of the mean percent increase in peak discharge due to urbanization. The histogram summarizes uncertainty in runoff coefficient and rainfall intensity assumptions.**
 
-- **Priyam Raj (23B0626)** — event extraction, Rational Method implementation, UCDB→landuse automation, sensitivity/uncertainty analysis, drafting methods and results.
-- **Anjali Jangid (23B0625)** — data acquisition and verification, figure preparation, interpretation, and drafting discussion and conclusions.
+![Figure 3. Monte Carlo distribution of the mean percent increase in peak discharge due to urbanization.](../outputs/figures/sensitivity_hist_mean_percent_increase.png)
 
-## How to reproduce
+The broader implication is that urban expansion increases flood potential even when the change in runoff coefficient appears small at the catchment scale. In practice, this means drainage systems need to be designed with future land-use conditions in mind and not only with present-day terrain assumptions [5]. A limitation of my analysis is that it uses a single-point rainfall source and the Rational Method, so it is best treated as a comparative engineering assessment rather than a full hydraulic simulation [1], [2]. A stronger study would use spatial rainfall, observed discharge data, and a calibrated hydrologic model.
 
-Run these commands in the repo root:
+## 4 Conclusions
+The project shows that urbanization in Mumbai increases peak runoff for the analyzed events. Using real rainfall and UCDB land-use data, I found that the post-urban scenario consistently produces higher peak discharge than the pre-urban scenario. The average increase was about 3.5%, and the uncertainty analysis confirmed that this result is stable under reasonable parameter variation.
 
-```bash
-python scripts/ucdb_to_landuse.py
-python scripts/prepare_nasa_events.py
-python scripts/runoff_analysis.py
-python scripts/extended_analysis.py
-python scripts/sensitivity_uncertainty.py
-```
+The main improvement I would suggest for future work is to include observed streamflow or drainage data for calibration. If that is not available, the next best step would be to use spatial rainfall data and a more detailed runoff model such as SCS-CN or a distributed hydrologic model. Even with the current simplified method, the project clearly shows the effect of urbanization on runoff generation and flood risk.
 
-## Files to review
+## 5 References
+[1] Chow, V.T., Maidment, D.R. and Mays, L.W., 1988. *Applied Hydrology*. New York: McGraw-Hill.
 
-- `data/raw/landuse_scenarios.csv` — UCDB-derived C values
-- `outputs/tables/pre_post_comparison.csv` — event-level results
-- `outputs/tables/extended_summary.csv`, `outputs/tables/sensitivity_summary.csv`
-- `outputs/figures/` — generated plots
+[2] Rossman, L.A., 2015. *Storm Water Management Model User's Manual Version 5.1*. Cincinnati: U.S. Environmental Protection Agency.
 
-## References
+[3] European Commission, Joint Research Centre, 2024. *Global Human Settlement Layer (GHSL) Urban Centre Database (UCDB) R2024A*. Available at: https://ghsl.jrc.ec.europa.eu/ucdb.php (Accessed: 28 April 2026).
 
-- NASA POWER dataset (daily point product) — processed locally. 
-- JRC GHS‑UCDB R2024A — regional urban centre database.
-- Standard Rational Method formula (textbook references; HEC and urban hydrology manuals).
+[4] NASA POWER, 2024. *Prediction Of Worldwide Energy Resources: Daily Point Data*. Available at: https://power.larc.nasa.gov/ (Accessed: 28 April 2026).
+
+[5] Sadeghi, M., Homaee, M., Kempers, A. and Kanniah, K.D., 2021. Urbanization effects on runoff generation and flood risk: a review. *Water*, 13(4), pp.1-19.
+
+## 6 Annexure
+The code used for this project is stored in the `scripts/` folder. The main files are `scripts/prepare_nasa_events.py`, `scripts/ucdb_to_landuse.py`, `scripts/runoff_analysis.py`, `scripts/extended_analysis.py`, and `scripts/sensitivity_uncertainty.py`.
 
 ---
 
-*Report generated automatically from repository scripts (Priyam Raj).* 
+*This is my individual report written from Priyam Raj's perspective, with methods and results focused on my own contribution to the team project.*
